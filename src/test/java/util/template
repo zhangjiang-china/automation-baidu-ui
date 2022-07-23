@@ -6997,7 +6997,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label text-navy">Total Case:</label>
+                                    <label class="col-sm-3 control-label text-navy">Case Total:</label>
                                     <div class="col-sm-6">
                                         <span class="form-control" id="testAll"></span>
                                     </div>
@@ -7027,7 +7027,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label text-navy">Run Time:</label>
+                                    <label class="col-sm-3 control-label text-navy">Duration:</label>
                                     <div class="col-sm-6">
                                         <span class="form-control" id="totalTime"></span>
                                     </div>
@@ -7061,16 +7061,16 @@
                 <div class="ibox-content">
                     <div class="input-group panel-heading" style="width: 100%; background-color: #1ab394; margin-bottom: 10px; text-align: left; font-family: Consolas;">
                         <label style="color: snow">Test Class:</label>
-                        <select class="chosen-select form-control" data-placeholder="Please Select" style="width: 200px;" name="filterClass" id="filterClass">
+                        <select class="chosen-select form-control" data-placeholder="Please Select" style="width: 150px;" name="filterClass" id="filterClass">
                             <option value="">All</option>
                         </select>
                         <label style="color: snow">Result:</label>
-                        <select class="chosen-select form-control" data-placeholder="Please Select" style="width: 200px;" name="filterResult" id="filterResult">
+                        <select class="chosen-select form-control" data-placeholder="Please Select" style="width: 150px;" name="filterResult" id="filterResult">
                             <option value="">All</option>
                         </select>
                         <div style="float: right">
                             <label class="form-control">
-                                <span class="text-navy">Case Num: </span><span class="text-navy b-r" id="filterAll"></span><span> | </span>
+                                <span class="text-navy">Case Total: </span><span class="text-navy b-r" id="filterAll"></span><span> | </span>
                                 <span style="color: green">Pass: </span><span style="color: green" id="filterOk"></span><span> | </span>
                                 <span class="text-danger">Fail: </span><span class="text-danger" id="filterFail"></span><span> | </span>
                                 <span class="text-warning">Skip: </span><span class="text-warning" id="filterSkip"></span>

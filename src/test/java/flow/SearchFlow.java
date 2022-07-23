@@ -18,6 +18,12 @@ import util.TimeUtil;
 
 public class SearchFlow {
 	public static void clickSettingIcon(WebDriver driver) {
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		//For different pages, the DOM structure is a little different for setting icon in top user setting
 		try {
 			WebElement settingIcon = driver.findElement(By.xpath("//*[@name='tj_settingicon']"));
@@ -153,7 +159,7 @@ public class SearchFlow {
 
 				String today = TimeUtil.getToday("yyyy年MM月dd日");
 				String yesterday = TimeUtil.getToday("yyyy年MM月dd日");
-				if(!updateDateRaw.contains("小时前") && !updateDateRaw.contains("1天前") && !updateDateRaw.contains(today) && !updateDateRaw.contains(yesterday)) {
+				if(!updateDateRaw.contains("前") && !updateDateRaw.contains(today) && !updateDateRaw.contains(yesterday)) {
 					Assert.assertTrue(false, "Search ERROR, this item is not in the last day, the update date is :" + updateDateRaw + ", the title is :" + title);
 				}
 			}
