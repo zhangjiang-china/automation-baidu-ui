@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotInteractableException;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -16,85 +15,76 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+import page.SearchPage;
 import util.SeleniumUtil;
 import util.TimeUtil;
 
 public class SearchFlow {
+	WebDriver driver;
 	
 	private static Logger log = LoggerFactory.getLogger(SearchFlow.class);
+	private SearchPage searchPage;
 	
-	public static void clickSettingIcon(WebDriver driver) {
+	public SearchFlow(WebDriver driver, SearchPage searchPage) {
+		this.searchPage = searchPage;
+		this.driver = driver;
+	}
+
+	public void clickSettingIcon() {
 		SeleniumUtil.waitUntilAllAjaxRequestCompletes(driver, 10);
 		
 		//For different pages, the DOM structure is a little different for setting icon in top user setting
 		try {
-			WebElement settingIcon = driver.findElement(By.xpath("//*[@name='tj_settingicon']"));
-			settingIcon.click();
+			searchPage.clickSettingIcon1();
 		}
-		catch(ElementNotInteractableException e) {
-			WebElement settingIcon = driver.findElement(By.id("s-usersetting-top"));
-			settingIcon.click();
+		catch(ElementNotInteractableException | NoSuchElementException e) {
+			searchPage.clickSettingIcon2();
 		}
 	}
 	
 	// Get advertisement count in current page
-	public static void getAdvCount(WebDriver driver) {
-		List<WebElement> advList = driver.findElements(By.xpath("//span[text() = '广告']"));
-		int advNum = advList.size();
+	public void getAdvCount() {
+		int advNum = searchPage.getAdvListSize();
 		log.info("There are " + advNum + " advertisement.");
 		
 	}
 	
-	public static void setLimitNoForEveryPage(WebDriver driver, int limitNoPerPage) {
-		JavascriptExecutor js = (JavascriptExecutor) driver;
+	public void setLimitNoForEveryPage(int limitNoPerPage) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		
-		clickSettingIcon(driver);
-		
-		WebElement searchSetMenu = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("a.setpref span.set")));
-		js.executeScript("arguments[0].click();", searchSetMenu);
+		clickSettingIcon();
+		searchPage.clickSearchSetMenu();
 		
 		String everyPageLimitElXpath = "//input[@name='NR'][@value=" + limitNoPerPage + "]";
 		WebElement everyPayLimitEl = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(everyPageLimitElXpath)));
 		everyPayLimitEl.click();
 		
-		WebElement saveSettingBtn = driver.findElement(By.cssSelector("a.prefpanelgo"));
-		saveSettingBtn.click();
+		searchPage.clickSaveSettingBtn();
 		
 		driver.switchTo().alert().accept();
 	}
 	
-	public static String searchByLimitTime(WebDriver driver, String limitTime, String searchKeyword) {
-		JavascriptExecutor js = (JavascriptExecutor) driver;
+	public String searchByLimitTime(String limitTime, String searchKeyword) {
+		clickSettingIcon();
 		
-		SearchFlow.clickSettingIcon(driver);
+		searchPage.clickSearchSetMenu();
 		
-		WebElement searchSetMenu = driver.findElement(By.cssSelector("a.setpref span.set"));
-		js.executeScript("arguments[0].click();", searchSetMenu);
+		searchPage.clickAdvancedSearchTab();
 		
-		WebElement advancedSearchTab = driver.findElement(By.xpath("//li[@data-tabid='advanced']"));
-		advancedSearchTab.click();
+		searchPage.clickTimeSelectBox();
 		
-		WebElement timeSelectBox = driver.findElement(By.xpath("//span[@id='adv-setting-gpc']//div[contains(@class,'adv-gpc-select')]"));
-		timeSelectBox.click();
+		searchPage.clickLastDaySelectItem();
 		
-		WebElement lastDaySelectItem = driver.findElement(By.xpath("//div[@class='c-select-dropdown-list']//p[2]"));
-		lastDaySelectItem.click();
-		
-		// Get selected time
-		WebElement selectedValueSpan = driver.findElement(By.xpath("//span[@id='adv-setting-gpc']//span[@class='c-select-selected-value']"));
-		String actualSelectedTime = selectedValueSpan.getText();
+		String actualSelectedTime = searchPage.getSelectedTimeSpan();
 		
 		Assert.assertEquals(actualSelectedTime, limitTime, "The expected selected value is " + limitTime + ", but got " + actualSelectedTime);
 		
-		WebElement containAllKeywordsEl = driver.findElement(By.xpath("//li[@class='result-setting']/div[1]//input"));
-		containAllKeywordsEl.sendKeys(searchKeyword);
+		searchPage.sendKeysToContainAllKeywordsEl(searchKeyword);
 		
 		// Store the current window handle
 		String winHandle1 = driver.getWindowHandle();
 		String winHandle2 = "";
-		WebElement advancedSearchSubmitBtn = driver.findElement(By.xpath("//input[@type='submit'][contains(@class,'advanced-search-btn')]"));
-		js.executeScript("arguments[0].click();", advancedSearchSubmitBtn);
+		searchPage.clickAdvancedSearchSubmitBtn();
 		// Switch to new window opened
 		for(String winHandle : driver.getWindowHandles()){
 		    if(!winHandle.equals(winHandle1)) {
@@ -106,12 +96,12 @@ public class SearchFlow {
 		return winHandle2;
 	}
 	
-	public static void validateSearchResult(WebDriver driver, int expectedSearhOutNo, String expectedKeyword) {
+	public void validateSearchResult(int expectedSearhOutNo, String expectedKeyword) {
 		SeleniumUtil.waitUntilAllAjaxRequestCompletes(driver, 10);
 		
 		// Exclude advertisement and recommend list
-		List<WebElement> searchedOutList = driver.findElements(By.xpath("//div[@id='content_left']/div[contains(@class,'result')][@tpl!='recommend_list'][not(descendant::span[text()='广告'])]"));
-		int actualSearchOutNo = searchedOutList.size();
+		List<WebElement> searchedOutList = searchPage.getSearchedOutList();
+		int actualSearchOutNo = searchPage.getSearchedOutListSize();
 		log.info("There are " + actualSearchOutNo + " results totally, exclude advertisement and recommend list.");
 		
 		// Validate searched out number
@@ -125,23 +115,21 @@ public class SearchFlow {
 		}
 	}
 	
-	public static void validateLimitLastDay(WebDriver driver, String oldWinHandle) {
+	public void validateLimitLastDay(String oldWinHandle) {
 
 		SeleniumUtil.waitUntilAllAjaxRequestCompletes(driver, 10);
-		
-		JavascriptExecutor js = (JavascriptExecutor) driver;
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 		
-		List<WebElement> searchedOutList = driver.findElements(By.xpath("//div[@id='content_left']/div[contains(@class,'result')][@tpl!='recommend_list'][not(descendant::span[text()='广告'])]"));
-		int actualSearchOutNum2 = searchedOutList.size();
-		log.info("Search by last day, There are " + actualSearchOutNum2 + " item totally.");
+		// Exclude advertisement and recommend list
+		List<WebElement> searchedOutList = searchPage.getSearchedOutList();
+		int actualSearchOutNo = searchPage.getSearchedOutListSize();
+		log.info("Search by last day, There are " + actualSearchOutNo + " item totally.");
 		
-		SearchFlow.getAdvCount(driver);
+		getAdvCount();
 		
 		for(WebElement el:searchedOutList) {
 			wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("h3.c-title>a")));
-			WebElement titleLinkEl = el.findElement(By.cssSelector("h3.c-title>a"));
-			String title = titleLinkEl.getText();
+			String title = searchPage.getTitleText();
 			String updateDateRaw = "";
 			
 			try {
@@ -161,7 +149,7 @@ public class SearchFlow {
 				Set<String> winHandlesBefore = driver.getWindowHandles();
 				
 				// Time display NOT in current page, need to open it in a new page.
-				js.executeScript("arguments[0].click();", titleLinkEl);
+				searchPage.clickTitleLink();
 				
 				// Switch to new window opened
 				for(String winHandle : driver.getWindowHandles()){
@@ -171,7 +159,7 @@ public class SearchFlow {
 				}
 				
 				// Get page's update date from meta attribute
-				updateDateRaw = driver.findElement(By.xpath("//meta[@itemprop='dateUpdate']")).getAttribute("content");
+				updateDateRaw = searchPage.getDateUpdateInNewOpenPage();
 				String updateDate = updateDateRaw.substring(0, 10);
 				
 				String today = TimeUtil.getToday("yyyy-MM-dd");

@@ -29,8 +29,8 @@ public class ScreenShot {
 		}
 	}
 
-	public void takeScreenshot() {
-		String screenName = String.valueOf(new Date().getTime()) + ".jpg";
+	public void takeCaseScreenshot(String methodName) {
+		String screenName = String.valueOf(methodName +new Date().getTime()) + ".jpg";
 		File dir = new File("test-output/snapshot");
 		if (!dir.exists())
 			dir.mkdirs();

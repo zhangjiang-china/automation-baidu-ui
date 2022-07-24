@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Smoke" parallel="methods" thread-count="3">
+	<test name="SmokeTest">
+		<classes>
+			<class name="test.SearchTest">
+				<methods>
+					<include name="searchLimitNoPerPage"/>
+					<include name="searchLimitLastDay"/>
+				</methods>
+			</class>
+		</classes>
+	</test>
+</suite>
