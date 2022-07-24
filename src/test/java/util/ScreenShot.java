@@ -2,6 +2,7 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
@@ -30,7 +31,9 @@ public class ScreenShot {
 	}
 
 	public void takeCaseScreenshot(String methodName) {
-		String screenName = String.valueOf(methodName +new Date().getTime()) + ".jpg";
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+		String time = formatter.format(System.currentTimeMillis());
+		String screenName = methodName + "_" + time + ".jpg";
 		File dir = new File("test-output/snapshot");
 		if (!dir.exists())
 			dir.mkdirs();
