@@ -16,17 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+import util.SeleniumUtil;
 import util.TimeUtil;
 
 public class SearchFlow {
+	
 	private static Logger log = LoggerFactory.getLogger(SearchFlow.class);
+	
 	public static void clickSettingIcon(WebDriver driver) {
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		SeleniumUtil.waitUntilAllAjaxRequestCompletes(driver, 10);
+		
 		//For different pages, the DOM structure is a little different for setting icon in top user setting
 		try {
 			WebElement settingIcon = driver.findElement(By.xpath("//*[@name='tj_settingicon']"));
@@ -108,36 +107,27 @@ public class SearchFlow {
 	}
 	
 	public static void validateSearchResult(WebDriver driver, int expectedSearhOutNo, String expectedKeyword) {
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		SeleniumUtil.waitUntilAllAjaxRequestCompletes(driver, 10);
 		
 		// Exclude advertisement and recommend list
 		List<WebElement> searchedOutList = driver.findElements(By.xpath("//div[@id='content_left']/div[contains(@class,'result')][@tpl!='recommend_list'][not(descendant::span[text()='广告'])]"));
 		int actualSearchOutNo = searchedOutList.size();
-		log.info("There are " + actualSearchOutNo + " result totally, exclude advertisement and recommend list.");
+		log.info("There are " + actualSearchOutNo + " results totally, exclude advertisement and recommend list.");
 		
 		// Validate searched out number
 		Assert.assertEquals(actualSearchOutNo, expectedSearhOutNo, "The expected searched out count is " + expectedSearhOutNo + ", but got " + actualSearchOutNo);
 		
 		// Validate searched out content's keyword
 		for(WebElement el : searchedOutList) {
-//			js.executeScript("arguments[0].scrollIntoView(true);", el);
+			// js.executeScript("arguments[0].scrollIntoView(true);", el);
 			String title = el.getText();
 			Assert.assertTrue(title.contains(expectedKeyword), "The searched out result should contain " + expectedKeyword + ", but not found, the title is :" + title);
 		}
 	}
 	
 	public static void validateLimitLastDay(WebDriver driver, String oldWinHandle) {
-		try {
-			Thread.sleep(8000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
+		SeleniumUtil.waitUntilAllAjaxRequestCompletes(driver, 10);
 		
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
@@ -193,7 +183,7 @@ public class SearchFlow {
 				driver.close();
 				driver.switchTo().window(oldWinHandle);
 			}
-			log.info("Title: " + title + ", update date : " + updateDateRaw);
+			log.debug("Title: " + title + ", update date : " + updateDateRaw);
 		}
 	}
 	
