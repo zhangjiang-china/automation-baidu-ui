@@ -12,11 +12,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import util.TimeUtil;
 
 public class SearchFlow {
+	private static Logger log = LoggerFactory.getLogger(SearchFlow.class);
 	public static void clickSettingIcon(WebDriver driver) {
 		try {
 			Thread.sleep(3000);
@@ -39,7 +42,8 @@ public class SearchFlow {
 	public static void getAdvCount(WebDriver driver) {
 		List<WebElement> advList = driver.findElements(By.xpath("//span[text() = '广告']"));
 		int advNum = advList.size();
-		System.out.println("There are " + advNum + " advertisement.");
+		log.info("There are " + advNum + " advertisement.");
+		
 	}
 	
 	public static void setLimitNoForEveryPage(WebDriver driver, int limitNoPerPage) {
@@ -114,7 +118,7 @@ public class SearchFlow {
 		// Exclude advertisement and recommend list
 		List<WebElement> searchedOutList = driver.findElements(By.xpath("//div[@id='content_left']/div[contains(@class,'result')][@tpl!='recommend_list'][not(descendant::span[text()='广告'])]"));
 		int actualSearchOutNo = searchedOutList.size();
-		System.out.println("There are " + actualSearchOutNo + " result totally, exclude advertisement and recommend list.");
+		log.info("There are " + actualSearchOutNo + " result totally, exclude advertisement and recommend list.");
 		
 		// Validate searched out number
 		Assert.assertEquals(actualSearchOutNo, expectedSearhOutNo, "The expected searched out count is " + expectedSearhOutNo + ", but got " + actualSearchOutNo);
@@ -140,7 +144,7 @@ public class SearchFlow {
 		
 		List<WebElement> searchedOutList = driver.findElements(By.xpath("//div[@id='content_left']/div[contains(@class,'result')][@tpl!='recommend_list'][not(descendant::span[text()='广告'])]"));
 		int actualSearchOutNum2 = searchedOutList.size();
-		System.out.println("Search by last day, There are " + actualSearchOutNum2 + " item totally.");
+		log.info("Search by last day, There are " + actualSearchOutNum2 + " item totally.");
 		
 		SearchFlow.getAdvCount(driver);
 		
@@ -189,7 +193,7 @@ public class SearchFlow {
 				driver.close();
 				driver.switchTo().window(oldWinHandle);
 			}
-			System.out.println("Title: " + title + ", update date : " + updateDateRaw);
+			log.info("Title: " + title + ", update date : " + updateDateRaw);
 		}
 	}
 	

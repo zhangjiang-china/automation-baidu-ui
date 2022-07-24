@@ -8,8 +8,11 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScreenShot {
+	private static Logger log = LoggerFactory.getLogger(ScreenShot.class);
 	public WebDriver driver;
 
 	public ScreenShot(WebDriver driver) {
@@ -22,7 +25,7 @@ public class ScreenShot {
 					.getScreenshotAs(OutputType.FILE);
 			FileUtils.copyFile(scrFile, new File(screenPath));
 		} catch (IOException e) {
-			System.out.println("Screen shot error: " + screenPath);
+			log.error("Screen shot error: " + screenPath);
 		}
 	}
 
